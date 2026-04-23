@@ -1,0 +1,22 @@
+all:
+  vars:
+    ansible_user: ubuntu
+  children:
+    front:
+      vars:
+        nginx_listen_port: 8080
+        nginx_server_name: "_"
+      hosts:
+        front1:
+          ansible_host: 10.0.0.11
+          leader: yes
+          nginx_listen_port: 8081
+        front2:
+          ansible_host: 10.0.0.12
+    back:
+      hosts:
+        back1:
+          ansible_host: 10.0.1.11
+          leader: yes
+        back2:
+          ansible_host: 10.0.0.12

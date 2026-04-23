@@ -1,0 +1,13 @@
+- name: Provision web-server
+  hosts: front
+  become: yes
+  tasks:
+    - name: Nginx install
+      apt:
+        name: nginx
+        state: present
+    - name: Nginx run
+      service:
+        name: nginx
+        state: started
+        enabled: yes

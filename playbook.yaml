@@ -1,0 +1,66 @@
+- name: Provision web-server
+  hosts: front
+  become: true
+  tasks:
+    - name: Nginx install
+      apt:
+        name: nginx
+        state: present
+    - name: Nginx run
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+
+
+- name: Provision backend
+  hosts: back
+  become: true
+  
+  tasks:
+    - name: Test
+      debug: msg="Just test print"
+
+    - name: Install packages
+      package:
+        name:
+          - atop
+        state: present
+      tags:
+        - packages
+    
+    - lineinfile:
+        path: /usr/share/atop/atop.daily
+        regexp: '^LOGINTERVAL=[0-9]*(.*)$'
+        line: 'LOGINTERVAL={{ atop_log_interval }}'
+      notify: atop restart
+    
+    - meta: flush_handlers
+
+    - name: Start and enable atop
+      systemd:
+        name: atop
+        state: started
+        enabled: yes
+    
+    - name: Install additional packages
+      package:
+        name: nano
+        state: present
+      tags:
+        - packages
+
+    - block:
+        - command: /usr/local/bin/do_something
+      rescue:
+        - debug: msg="Failed, running rollback"
+      always:
+        - debug: msg="Always done"
+
+  handlers:
+    - name: atop restart
+      service:
+        name: atop
+        state: restarted
+        daemon_reload: yes

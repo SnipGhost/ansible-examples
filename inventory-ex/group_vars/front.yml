@@ -1,0 +1,13 @@
+---
+nginx_listen_port: 8080
+nginx_server_name: "_"
+
+some_coplex_structure:
+  - acl_name: ssh
+    protocol: tcp
+    port: 22
+  - acl_name: http
+    protocol: tcp
+    port: 80
+  - acl_name: icmp
+    protocol: icmp

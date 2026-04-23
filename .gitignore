@@ -1,0 +1,32 @@
+# Local .terraform directories
+.terraform/
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# May contain sensitive data
+*.tfvars
+*.tfvars.json
+!example.auto.tfvars
+
+# Ignore transient lock info files
+.terraform.tfstate.lock.info
+
+# Include tfplan files: terraform plan -out=tfplan
+tfplan
+tfplan.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Custom for s3
+backend.hcl
+
+# Ansible secrets
+#secret.yaml

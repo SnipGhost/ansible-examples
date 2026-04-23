@@ -1,0 +1,95 @@
+- hosts: app
+  become: true
+  vars:
+    app_user: myapp
+    app_group: myapp
+    app_dir: /opt/myapp
+    venv_dir: /opt/myapp/venv
+    repo_url: "https://github.com/you/myapp.git"
+    app_version: "main"   # or tag/commit
+    service_name: myapp
+
+  tasks:
+    - name: Ensure OS packages for venv/pip are present (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-venv
+          - python3-pip
+          - git
+        state: present
+        update_cache: true
+
+    - name: Create app user
+      ansible.builtin.user:
+        name: "{{ app_user }}"
+        system: true
+        create_home: false
+        shell: /usr/sbin/nologin
+
+    - name: Create app directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0755"
+
+    - name: Checkout application code
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}/src"
+        version: "{{ app_version }}"
+      become_user: "{{ app_user }}"
+
+    - name: Install app into venv (creates venv if missing)
+      ansible.builtin.pip:
+        virtualenv: "{{ venv_dir }}"
+        virtualenv_command: "python3 -m venv"
+        name: "{{ app_dir }}/src"          # assumes pyproject.toml/setup.py
+        editable: false
+        extra_args: "--upgrade"
+      become_user: "{{ app_user }}"
+
+    - name: Install additional requirements (optional)
+      ansible.builtin.pip:
+        virtualenv: "{{ venv_dir }}"
+        requirements: "{{ app_dir }}/src/requirements.txt"
+      become_user: "{{ app_user }}"
+      when: ansible.builtin.stat(path=app_dir + '/src/requirements.txt').stat.exists | default(false)
+
+    - name: Create systemd unit
+      ansible.builtin.copy:
+        dest: "/etc/systemd/system/{{ service_name }}.service"
+        mode: "0644"
+        content: |
+          [Unit]
+          Description={{ service_name }}
+          After=network.target
+
+          [Service]
+          Type=simple
+          User={{ app_user }}
+          Group={{ app_group }}
+          WorkingDirectory={{ app_dir }}/src
+          Environment=VIRTUAL_ENV={{ venv_dir }}
+          Environment=PATH={{ venv_dir }}/bin:/usr/bin:/bin
+          ExecStart={{ venv_dir }}/bin/python -m myapp   # adjust
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+      notify: restart myapp
+
+    - name: Enable and start service
+      ansible.builtin.systemd:
+        name: "{{ service_name }}"
+        enabled: true
+        state: started
+        daemon_reload: true
+
+  handlers:
+    - name: restart myapp
+      ansible.builtin.systemd:
+        name: "{{ service_name }}"
+        state: restarted

@@ -1,0 +1,4 @@
+provider_username = "mikhail.kucherenko@vk.com"
+provider_password = "secret"
+provider_project = "ce33222329e64fdea5a371af79b1b746"
+provider_auth_url = "https://msk.cloud.vk.com/infra/identity/v3/"

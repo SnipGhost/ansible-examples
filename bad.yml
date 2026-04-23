@@ -1,0 +1,11 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    # Нарушает декларативность
+    - name: Create file via shell (imperative)
+      ansible.builtin.shell: "echo $(date) > /tmp/date.conf"
+
+    # Нарушает идемпотентность
+    - name: Append random line every run (non-idempotent)
+      ansible.builtin.shell: "echo $RANDOM >> /etc/app.conf"
+      become: true
