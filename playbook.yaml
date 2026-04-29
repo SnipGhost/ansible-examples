@@ -3,64 +3,73 @@
   become: true
   tasks:
     - name: Nginx install
-      apt:
+      ansible.builtin.apt:
         name: nginx
         state: present
     - name: Nginx run
-      service:
+      ansible.builtin.service:
         name: nginx
         state: started
-        enabled: yes
-
+        enabled: true
 
 
 - name: Provision backend
   hosts: back
   become: true
-  
+
   tasks:
     - name: Test
-      debug: msg="Just test print"
+      ansible.builtin.debug:
+        msg: "Just test print"
 
     - name: Install packages
-      package:
+      ansible.builtin.package:
         name:
           - atop
         state: present
       tags:
         - packages
-    
-    - lineinfile:
+
+    - name: Change config
+      ansible.builtin.lineinfile:
         path: /usr/share/atop/atop.daily
         regexp: '^LOGINTERVAL=[0-9]*(.*)$'
         line: 'LOGINTERVAL={{ atop_log_interval }}'
       notify: atop restart
-    
-    - meta: flush_handlers
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
 
     - name: Start and enable atop
-      systemd:
+      ansible.builtin.systemd:
         name: atop
         state: started
-        enabled: yes
-    
+        enabled: true
+
     - name: Install additional packages
-      package:
+      ansible.builtin.package:
         name: nano
         state: present
       tags:
         - packages
 
-    - block:
-        - command: /usr/local/bin/do_something
+    - name: Any block name
+      block:
+        - name: Do something
+          ansible.builtin.command: /usr/local/bin/do_something
+          changed_when: false
       rescue:
-        - debug: msg="Failed, running rollback"
+        - name: Rescue debug
+          ansible.builtin.debug:
+            msg: "Failed, running rollback"
       always:
-        - debug: msg="Always done"
+        - name: Always debug
+          ansible.builtin.debug:
+            msg: "Always done"
 
   handlers:
-    - name: atop restart
-      service:
+    - name: Atop restart
+      ansible.builtin.service:
         name: atop
         state: restarted
-        daemon_reload: yes
+        daemon_reload: true
