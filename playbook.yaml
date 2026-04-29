@@ -3,11 +3,11 @@
   become: true
   tasks:
     - name: Nginx install
-      ansible.builtin.apt:
+      apt:
         name: nginx
         state: present
     - name: Nginx run
-      ansible.builtin.service:
+      service:
         name: nginx
         state: started
         enabled: true
@@ -19,11 +19,11 @@
 
   tasks:
     - name: Test
-      ansible.builtin.debug:
+      debug:
         msg: "Just test print"
 
     - name: Install packages
-      ansible.builtin.package:
+      package:
         name:
           - atop
         state: present
@@ -31,23 +31,23 @@
         - packages
 
     - name: Change config
-      ansible.builtin.lineinfile:
+      lineinfile:
         path: /usr/share/atop/atop.daily
         regexp: '^LOGINTERVAL=[0-9]*(.*)$'
         line: 'LOGINTERVAL={{ atop_log_interval }}'
       notify: atop restart
 
     - name: Flush handlers
-      ansible.builtin.meta: flush_handlers
+      meta: flush_handlers
 
     - name: Start and enable atop
-      ansible.builtin.systemd:
+      systemd:
         name: atop
         state: started
         enabled: true
 
     - name: Install additional packages
-      ansible.builtin.package:
+      package:
         name: nano
         state: present
       tags:
@@ -56,20 +56,20 @@
     - name: Any block name
       block:
         - name: Do something
-          ansible.builtin.command: /usr/local/bin/do_something
+          command: /usr/local/bin/do_something
           changed_when: false
       rescue:
         - name: Rescue debug
-          ansible.builtin.debug:
+          debug:
             msg: "Failed, running rollback"
       always:
         - name: Always debug
-          ansible.builtin.debug:
+          debug:
             msg: "Always done"
 
   handlers:
     - name: Atop restart
-      ansible.builtin.service:
+      service:
         name: atop
         state: restarted
         daemon_reload: true
