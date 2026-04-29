@@ -1,0 +1,14 @@
+Hello, {{ user }}!
+
+{% if vms|length > 0 -%}
+This is an automatic message to notify you that
+your old virtual machines need to be deleted:
+{%- for vm in vms %}
+- {{ vm }}
+{%- endfor %}
+{%- else -%}
+Thank you for your cleanup!
+{%- endif %}
+
+Best wishes, your bot!
+{{ bot_email | default("digital.tech@corp.mail.ru") }}

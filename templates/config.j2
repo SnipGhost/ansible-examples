@@ -1,0 +1,17 @@
+{{ ansible_managed }}
+
+{% if mosquitto_users is defined %}
+{%- for user in mosquitto_users | default([]) -%}
+user {{ user.name }}
+{%- if user.acl is iterable and user.acl is not string and user.acl is not mapping %}
+{%- for acl in user.acl | default([]) %}
+  {{ acl.type | default("pattern") }} {{ acl.access }} {{ acl.topic }}
+{%- endfor %}
+{%- elif user.acl is mapping %}
+  {{ user.acl.type | d("pattern") }} {{ user.acl.access }} {{ user.acl.topic }}
+{%- else %}
+  {{ user.acl }}
+{%- endif %}
+
+{% endfor -%}
+{% endif -%}

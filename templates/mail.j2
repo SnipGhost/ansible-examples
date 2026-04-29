@@ -1,0 +1,10 @@
+Hello, {{ user }}!
+
+This is an automatic message to notify you that
+your old virtual machines need to be deleted:
+{%- for vm in vms %}
+- {{ vm }}
+{%- endfor %}
+
+Best wishes, your bot!
+{{ bot_email | default("digital.tech@corp.mail.ru") }}

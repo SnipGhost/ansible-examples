@@ -1,0 +1,8 @@
+{
+    "user": "m.kucherenko",
+    "vms": [
+        "test-vm",
+        "prod-vm-1",
+        "prod-vm-2"
+    ]
+}

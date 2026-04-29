@@ -1,0 +1,24 @@
+# Joined: {{ test_data | join(", ") | title }}
+{%- set s = "Hello, World! Its very beautiful World!" %}
+# Splitted: {{ s.split(" ") | sort | unique | list }}
+# Truncated: {{ s | truncate(length=15, killwords=False, end='…') }}
+# Users: {{ mosquitto_users | map(attribute='name') | join(', ') }}
+# Special: {{ mosquitto_users | selectattr('special') | list }}
+
+{% set count = test_data|length -%}
+{%- for val in test_data %}
+# {{ loop.index0 }}: [{{ loop.index }} from {{ count }}] {{ val }}
+{%- endfor %}
+
+{% for key, val in mosquitto_users[0] | items %}
+# {{ key | upper }} = {% if key == "pass" %}{{ val|e|safe }}{% else %}{{ val }}{% endif %}
+{%- endfor %}
+
+
+{# comment #}
+{# {%- set user = "test" -%} #}
+{# {%- filter indent(width='# ', first=True) %} #}
+{# {%- filter upper() %} #}
+{%- include 'mail_complex.j2' %}
+{# {%- endfilter %} #}
+{# {%- endfilter %} #}

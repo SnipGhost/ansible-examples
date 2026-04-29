@@ -1,0 +1,6 @@
+user: "m.kucherenko"
+bot_email: "press@tech.vk.com"
+vms:
+  - "test-vm"
+  - "dev-vm-1"
+  - "dev-vm-2"

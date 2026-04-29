@@ -1,0 +1,26 @@
+ansible_managed: "# Ansible managed, do not edit #"
+mosquitto_users:
+  - name: example
+    pass: "s'ecret"
+    acl:
+      - topic: exampletopic
+        access: readwrite
+  - name: exporter_user
+    pass: "secret"
+    acl:
+      - topic: "#"
+        access: read
+      - topic: "$SYS/#"
+        access: read
+  - name: special_user
+    acl: "pattern # readwrite"
+    special: true
+  - name: mapping_user
+    acl:
+      topic: "test"
+      access: "read"
+test_data:
+  - hello
+  - world
+  - my
+  - fiend
