@@ -1,6 +1,15 @@
 # Features
 
 
+## Docs
+
+```bash
+ansible-doc -F
+ansible-doc package
+ansible-doc -s package
+```
+
+
 ## Inventory
 
 ```bash
@@ -8,6 +17,7 @@ ansible-playbook -i "192.168.8.136," test.yml
 ansible-playbook -i "host1.local,host2.local" test.yml
 
 ansible-inventory --graph
+ansible --list-host back
 ```
 
 
@@ -30,11 +40,10 @@ ansible-playbook test.yml -l "front,back"
 # hosts in group front AND in group back
 ansible-playbook test.yml -l "front:&back"
 # hosts in group front AND NOT in group back
-ansible-playbook test.yml -l "font:!back"
-
+ansible-playbook test.yml -l 'font:!back'
 
 ansible-playbook playbook.yaml --limit "front:&back"
-ansible-playbook playbook.yaml --limit "db[0:2]"
+ansible-playbook playbook.yaml --limit 'db[0:2]'
 ```
 
 
@@ -69,8 +78,20 @@ ansible-playbook -l back playbook.yaml --tags packages
 ansible-playbook -l back playbook.yaml --skip-tags packages
 ```
 
+Кроме того, зарезервированные [теги](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_tags.html):
+- all
+- always
+- never
+- tagged
+- untagged
 
-## Serial
+```bash
+ansible-playbook playbook.yaml --list-tags
+ansible-playbook playbook.yaml --tags "test,packages" --list-tasks
+```
+
+
+## Serial + throttle
 
 ```yaml
 - hosts: web
@@ -78,9 +99,12 @@ ansible-playbook -l back playbook.yaml --skip-tags packages
   tasks:
     - service: name=myapp state=restarted
 ```
+Можно комбинировать с `throttle`
 
 
 ## Strategy
+
+[Documentation](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_strategies.html)
 
 ```yaml
 - hosts: all
@@ -88,7 +112,7 @@ ansible-playbook -l back playbook.yaml --skip-tags packages
 ```
 
 
-## Try-Catch
+## Block + Try-Catch
 
 ```yaml
 - block:
@@ -134,6 +158,7 @@ tasks:
 ```yaml
 - meta: flush_handlers
 ```
++ Кроме того meta полезен и для [других задач](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/meta_module.html)
 
 
 ## Register
